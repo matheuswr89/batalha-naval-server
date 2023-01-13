@@ -1,1 +1,1 @@
-web: gunicorn --worker-class eventlet -w 1 servidor:app
+web: gunicorn servidor:app

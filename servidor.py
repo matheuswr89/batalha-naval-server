@@ -60,7 +60,7 @@ def send_board(data):
         board = data["board"]
         data_board["board"] = board
         emit("send_board", sala[room], room=room)
-        time.sleep(.5)
+        time.sleep(1)
         print(sala[room])
         emit("get_board", sala[room], room=room)
 
@@ -116,6 +116,7 @@ def joinRoom(room, my_id, num=1):
     sala[room]["size"] = num
     emit("id_room", f"Your room: {room}", room=room)
     if (num == 2):
+        time.sleep(1)
         emit("room_message", "Sala cheia,"+my_id, room=room)
 
 # Inicia ou adiciona um novo usuario na sala

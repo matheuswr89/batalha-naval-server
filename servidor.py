@@ -116,7 +116,7 @@ def joinRoom(room, my_id, num=1):
     sala[room]["size"] = num
     emit("id_room", f"Your room: {room}", room=room)
     if (num == 2):
-        time.sleep(1)
+        time.sleep(2)
         emit("room_message", "Sala cheia,"+my_id, room=room)
 
 # Inicia ou adiciona um novo usuario na sala

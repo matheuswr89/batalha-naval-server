@@ -111,12 +111,12 @@ def connection():
     remove()
 
 
-def joinRoom(room, num=1):
+def joinRoom(room, my_id, num=1):
     join_room(room)
     sala[room]["size"] = num
     emit("id_room", f"Your room: {room}", room=room)
     if (num == 2):
-        emit("room_message", "Sala cheia", room=room)
+        emit("room_message", "Sala cheia,"+my_id, room=room)
 
 # Inicia ou adiciona um novo usuario na sala
 
@@ -126,17 +126,17 @@ def on_join(data):
     room = verify_room()
     time.sleep(1)
     username = data["username"]
-    id = request.sid
+    my_id = request.sid
     if room == None:
         room = data["room"]
         sala[room] = {"size": 0}
-        sala[room]["jogador1"] = {"name": username, "id": id,
+        sala[room]["jogador1"] = {"name": username, "id": my_id,
                                   "placar": 0, "myturn": True, "cliques": 0, "acertos": 0, "ganhou": -1}
-        joinRoom(room)
+        joinRoom(room, my_id)
     else:
-        sala[room]["jogador2"] = {"name": username, "id": id,
+        sala[room]["jogador2"] = {"name": username, "id": my_id,
                                   "placar": 0, "myturn": False, "cliques": 0, "acertos": 0, "ganhou": -1}
-        joinRoom(room, 2)
+        joinRoom(room, my_id, 2)
 
 # Pega os dados do jogador pelo id dele
 

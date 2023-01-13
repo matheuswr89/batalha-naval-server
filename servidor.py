@@ -54,51 +54,51 @@ def verify_room():
 
 @socketio.on("board")
 def send_board(data):
-    room = data["room"]
-    data_board = get_player(room, data["id"])
-    board = data["board"]
-    data_board["board"] = board
-    emit("send_board", sala[room], room=room)
-    time.sleep(.5)
-    print(sala[room])
-    emit("get_board", sala[room], room=room)
+    if data["id"] != '':
+        room = data["room"]
+        data_board = get_player(room, data["id"])
+        board = data["board"]
+        data_board["board"] = board
+        emit("send_board", sala[room], room=room)
+        time.sleep(.5)
+        print(sala[room])
+        emit("get_board", sala[room], room=room)
 
 # altera um board de acordo com as posiçoes passadas
 
 
 @socketio.on("alter_board")
-def send_board(data):
-    id = data["id"]
-    room = data["room"]
-    x = data["x"]
-    y = data["y"]
-    current_player = get_player(room, id)
-    player = get_adversary(room, id)
-    if player["board"][x][y] == '0':
-        player["board"][x][y] = 'Q'
-        current_player["myturn"] = False
-        player["myturn"] = True
-        sala[room]["acertou"] = False
-        print(room)
-    else:
-        player["board"][x][y] = 'W'
-        player["placar"] = player["placar"]+1
-        current_player["myturn"] = True
-        player["myturn"] = False
-        sala[room]["acertou"] = True
-        player["acertos"] = player["acertos"] + 1
-        if player["acertos"] == 19:
-            player["ganhou"] = True
-            current_player["ganhou"] = False
-    player["cliques"] = player["cliques"] + 1
-    emit("send_board", sala[room], room=room)
+def alter_board(data):
+    if data["id"] != '':
+        room = data["room"]
+        x = data["x"]
+        y = data["y"]
+        current_player = get_player(room, data["id"])
+        player = get_adversary(room, data["id"])
+        if player["board"][x][y] == '0':
+            player["board"][x][y] = 'Q'
+            current_player["myturn"] = False
+            player["myturn"] = True
+            sala[room]["acertou"] = False
+            print(room)
+        else:
+            player["board"][x][y] = 'W'
+            player["placar"] = player["placar"]+1
+            current_player["myturn"] = True
+            player["myturn"] = False
+            sala[room]["acertou"] = True
+            player["acertos"] = player["acertos"] + 1
+            if player["acertos"] == 19:
+                player["ganhou"] = True
+                current_player["ganhou"] = False
+        player["cliques"] = player["cliques"] + 1
+        emit("send_board", sala[room], room=room)
 
 # Verifica se um usuario se desconectou de uma sala
 
 
 @socketio.on("disconnect")
 def disconect():
-    print(request.sid)
     disconectedsSockets.append(request.sid)
     delete_room_or_player(request.sid)
     remove()
@@ -108,7 +108,6 @@ def disconect():
 
 @socketio.on("connection")
 def connection():
-    print('Connected: '+request.sid)
     remove()
 
 
@@ -116,8 +115,6 @@ def joinRoom(room, num=1):
     join_room(room)
     sala[room]["size"] = num
     emit("id_room", f"Your room: {room}", room=room)
-    print(room)
-    print(sala[room])
     if (num == 2):
         emit("room_message", "Sala cheia", room=room)
 
@@ -129,14 +126,15 @@ def on_join(data):
     room = verify_room()
     time.sleep(1)
     username = data["username"]
+    id = request.sid
     if room == None:
         room = data["room"]
         sala[room] = {"size": 0}
-        sala[room]["jogador1"] = {"name": username, "id": request.sid,
+        sala[room]["jogador1"] = {"name": username, "id": id,
                                   "placar": 0, "myturn": True, "cliques": 0, "acertos": 0, "ganhou": -1}
         joinRoom(room)
     else:
-        sala[room]["jogador2"] = {"name": username, "id": request.sid,
+        sala[room]["jogador2"] = {"name": username, "id": id,
                                   "placar": 0, "myturn": False, "cliques": 0, "acertos": 0, "ganhou": -1}
         joinRoom(room, 2)
 
